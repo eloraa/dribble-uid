@@ -25,7 +25,7 @@ data
     const filePath = path.resolve('./data/json/', name)
     
     save
-      .writeFile(filePath, payload)
+      .writeFile(filePath, payload, EOL: '\r\n')
       .then((res) => {
         console.log(payload, "\n");
         console.log(
