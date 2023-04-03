@@ -1,0 +1,46 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      fileName:
+        description: 'Name of the project'
+        required: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Build
+      run: |
+        yarn
+        yarn generate ${{ github.event.inputs.fileName }}
+        
+    - name: Set commit message
+      id: commit_message
+      run: echo "TIMESTAMPS=$(date +%s)" >> $GITHUB_ENV
+    
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: ${{ env.TIMESTAMPS }}
+        branch: main
+        repository: .
+        commit_user_name: ✨
+        commit_user_email: <>
+        commit_author: ✨ <>
+        add_options: '-A'
